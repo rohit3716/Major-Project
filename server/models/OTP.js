@@ -14,14 +14,14 @@ const OTPSchema = new mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now(),
-        expires: 5*60,
+        expires: 5*60*1000,
     },
 });
 
 //function to send emails
 async function sendVerificationEmail( email, otp ){
     //create a transporter to send emails
-
+    // console.log(email, otp);
     //define the email options
 
     //send the mail
@@ -38,6 +38,8 @@ async function sendVerificationEmail( email, otp ){
 OTPSchema.pre("save",async function(next) {
     console.log("New document saved to DB");
     if( this.isNew )
+    console.log(this.isNew);
+    console.log(this.email, this.otp);
     await sendVerificationEmail( this.email, this.otp);
     next();
 })

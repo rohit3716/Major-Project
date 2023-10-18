@@ -1,19 +1,21 @@
 const Category = require('../models/Category');
 const Course = require('../models/Course');
-const Tag = require('../models/Tags');
 const User = require('../models/User');
 const { uploadImageToCloudinary } = require('../utils/imageUploader');
+const cloudinary = require('cloudinary').v2;
 
 exports.createCourse = async ( req, res ) => {
     try {
 
         //get user id from request object
         const userId = req.user.id;
+        // console.log(userId);
         //fetch data
-        const { courseName, courseDescription, whatYouWillLearn, price, tag, category, status, instructions, } = req.body;
+        let { courseName, courseDescription, whatYouWillLearn, price, tag, category, status, instructions, } = req.body;
         
         //get thumbnail
         const thumbnail = req.files.thumbnailImage;
+        // console.log(thumbnail);
 
         //validation
         if( !courseName || !courseDescription || !whatYouWillLearn || !price || !tag || !thumbnail || !category ) {
@@ -39,7 +41,7 @@ exports.createCourse = async ( req, res ) => {
         }
 
         //check given tag is valid or not
-        const categoryDetails = await Tag.findById(category);
+        const categoryDetails = await Category.findById(category);
         if( !categoryDetails ) {
             return res.status(404).json({
                 success:false,
@@ -59,6 +61,7 @@ exports.createCourse = async ( req, res ) => {
             whatYouWillLearn: whatYouWillLearn,
             price,
             category:categoryDetails._id,
+            tag:tag,
             thumbnail:thumbnailImage.secure_url,
             status:status,
             instructions:instructions,
@@ -106,6 +109,77 @@ exports.createCourse = async ( req, res ) => {
     }
 }
 
+
+// exports.updateCourse = async (req, res) => {
+
+//     try {
+//         const {courseName, courseDescription, price, tag, whatYouWillLearn, category, courseId} = req.body;
+
+//     const thumbnailImage = req.files.thumbnailImage;
+    
+
+//     if( !courseId ){
+//         return res.status(400).json({
+//             success:false,
+//             message:"There is not any course available of this courseID",
+//         })
+//     }
+//     console.log("courseID: ", courseId);
+
+
+
+//     if( !thumbnailImage ){
+//         const course = await Course.findByIdAndUpdate(courseId,
+//             {
+//                 courseName,
+//                 courseDescription,
+//                 price,
+//                 tag,
+//                 whatYouWillLearn,
+//                 category,
+//             },
+//             {new:true}
+//         );
+//     }
+
+//     const course = await Course.findById(courseId);
+//     //modifying thumbnail image 
+//     const imgId = course.thumbnail.public_id;
+//     console.log("imgID: ", imgId);
+//     if( imgId ){
+//         await cloudinary.uploader.destroy(imgId);
+//     }
+
+//     const newImg = await uploadImageToCloudinary( thumbnailImage, process.env.FOLDER_NAME);
+//     await Course.findByIdAndUpdate(courseId,
+//         {
+//             courseName,
+//             courseDescription,
+//             price,
+//             tag,
+//             whatYouWillLearn,
+//             category,
+//             thumbnail:newImg.secure_url,
+//         },
+//         {new:true}
+//     );
+
+
+//     console.log("course", course);
+//     return res.status(200).json({
+//         success:true,
+//         message:"Course edited successfully",
+//         course,
+//     })
+//     } catch (error) {
+//         return res.json(500).json({
+//             success:false,
+//             message:"Error while editing the course section",
+//         })
+//     }
+    
+   
+// }
 
 //get All courses handler function
 exports.getAllCourses = async ( req, res ) => {
@@ -156,7 +230,7 @@ exports.getCourseDetails = async (req, res) => {
                             }
                         )
                         .populate("category")
-                        .populate("ratingAndreviews")
+                        // .populate("ratingAndreviews")
                         .populate({
                             path:"courseContent",
                             populate:{
@@ -185,3 +259,5 @@ exports.getCourseDetails = async (req, res) => {
         });
     }
 }
+
+

@@ -87,11 +87,28 @@ exports.deleteSection = async (req, res) => {
     try {
         //get ID
         //assuming that we are sending id in params
-        const {sectionId} = req.params;
+
+        //TODO : - check by params that it is working or not
+
+        const {sectionId, courseId} = req.body;
+
+        await Course.findByIdAndUpdate(
+            {_id:courseId},
+            {
+                $pull:{
+                    courseContent:sectionId,
+                }
+            }
+        );
+
+
         //use findByIdandDelete
+
         await Section.findByIdAndDelete(sectionId);
 
         //TODO : Do we need to delete the entry from course schema
+
+
 
         //return res
         return res.status(200).json({

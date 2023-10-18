@@ -7,7 +7,7 @@ exports.createCategory = async ( req, res ) => {
         const {name, description} = req.body;
 
         //validation
-        if( !name || !description) {
+        if( !name ) {
             return re.status(400).json({
                 success:false,
                 message:'All fields are required',
@@ -43,7 +43,7 @@ exports.showAllCategory = async ( req, res ) => {
         res.status(200).json({
             success:true,
             message:'All categories returned Successfully',
-            allCategory,
+            data: allCategory,
         })
     } catch (error) {
         return res.status(500).json({
